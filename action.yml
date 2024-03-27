@@ -8,6 +8,11 @@ inputs:
       Version range or exact version of Python or PyPy to use, using SemVer's version range syntax.
       Reads from .python-version if unset.
     required: true
+  architecture:
+    description: "The target architecture (x86, x64) of the Python interpreter."
+    options: ["x86", "x64"]
+    required: false
+    default: "x64"
 
 runs:
   using: "composite"
@@ -16,13 +21,14 @@ runs:
       if: ${{ inputs.python-version != '2.7' }}
       uses: actions/setup-python@v5
       with:
+        architecture: ${{ inputs.architecture }}
         python-version: ${{ inputs.python-version }}
 
     - name: Windows Install
       shell: bash
       if: ${{ inputs.python-version == '2.7' && runner.os == 'Windows' }}
       run: |
-        choco install python2 --version=2.7.18 -y --no-progress
+        choco install python2 --version=2.7.18 -y --no-progress --x86=${{ inputs.architecture == 'x86' }}
 
     - name: Linux Install
       shell: bash
